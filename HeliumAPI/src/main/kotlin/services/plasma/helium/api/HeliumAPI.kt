@@ -139,4 +139,10 @@ enum class HeliumAPI {
     fun getOnlineFriends(uuid: UUID): Boolean {
         throw RuntimeException("HeliumAPI is not a plugin!")
     }
+
+    @Throws(RuntimeException::class)
+    fun isVanished(uuid: UUID): Boolean {
+        throw RuntimeException("HeliumAPI is not a plugin!")
+    }
+
 }
