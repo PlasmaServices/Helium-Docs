@@ -25,6 +25,7 @@
     </repositories>
 
     <build>
+        <finalName>HeliumAPI</finalName>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <plugins>
             <plugin>

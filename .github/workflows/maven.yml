@@ -1,31 +1,82 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-name: Java CI with Maven
+name: Buildmaster 3000
 
 on:
   push:
-    branches: [ "API" ]
+    branches:
+      - API
   pull_request:
-    branches: [ "API" ]
+    branches:
+      - API
 
 jobs:
-  build:
-
+  build-and-release:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 11
-      uses: actions/setup-java@v4
-      with:
-        java-version: '11'
-        distribution: 'temurin'
-        cache: maven
-    - name: Build with Maven
-      run: mvn -B package --file HeliumAPI/pom.xml
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Required to get full commit history for short SHA
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Get short commit SHA
+        id: git-sha
+        run: echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Build with Maven
+        run: mvn -B install --file pom.xml
+
+      - name: Rename JAR and Collect build artifacts
+        run: |
+          # Create artifacts directory
+          mkdir -p release-artifacts
+          # Get the short commit SHA
+          SHORT_SHA="${{ steps.git-sha.outputs.sha }}"
+          # Rename the JAR file
+          mv target/HeliumAPI.jar target/HeliumAPI-${SHORT_SHA}.jar
+          # Copy the renamed JAR file to the artifacts directory
+          cp target/HeliumAPI-${SHORT_SHA}.jar release-artifacts/
+
+      - name: Delete old release
+        run: |
+          # Get the release ID of the latest release
+          RELEASE_ID=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/latest" | \
+            jq -r '.id')
+          
+          # Delete the old release if it exists
+          if [ "$RELEASE_ID" != "null" ]; then
+            echo "Deleting old release with ID: $RELEASE_ID"
+            curl -X DELETE -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID"
+          else
+            echo "No old release found."
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: latest-build
+          name: "Latest Release (${{ github.run_id }})"
+          body: "Release created by GitHub Actions\nCommit: ${{ github.sha }}"
+          prerelease: false
+          draft: false
+          overwrite: true
+          files: |
+            release-artifacts/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Force push updated tag
+        if: github.event_name == 'push'
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git tag -fa latest-build -m "Automated build ${{ github.run_id }}"
+          git push origin latest-build --force
