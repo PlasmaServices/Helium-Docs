@@ -31,17 +31,8 @@ jobs:
 
       - name: Build with Maven
         run: mvn -B install --file pom.xml
-
-      - name: Rename JAR and Collect build artifacts
-        run: |
-          # Create artifacts directory
-          mkdir -p release-artifacts
-          # Get the short commit SHA
-          SHORT_SHA="${{ steps.git-sha.outputs.sha }}"
-          # Rename the JAR file
-          mv target/HeliumAPI.jar target/HeliumAPI-${SHORT_SHA}.jar
-          # Copy the renamed JAR file to the artifacts directory
-          cp target/HeliumAPI-${SHORT_SHA}.jar release-artifacts/
+        working-directory: HeliumAPI
+        shell: bash
 
       - name: Delete old release
         run: |
@@ -49,12 +40,21 @@ jobs:
           RELEASE_ID=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/releases/latest" | \
             jq -r '.id')
-          
+
+          # Check if the curl command was successful
+          if [ $? -ne 0 ]; then
+            echo "Failed to retrieve release ID. Skipping deletion."
+            exit 0 # Exit gracefully, don't fail the workflow
+          fi
+
           # Delete the old release if it exists
           if [ "$RELEASE_ID" != "null" ]; then
             echo "Deleting old release with ID: $RELEASE_ID"
             curl -X DELETE -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
               "https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID"
+            if [ $? -ne 0 ]; then
+              echo "Failed to delete release with ID: $RELEASE_ID.  Continuing..."
+            fi
           else
             echo "No old release found."
           fi
@@ -69,7 +69,7 @@ jobs:
           draft: false
           overwrite: true
           files: |
-            release-artifacts/**/*
+            HeliumAPI/target/HeliumAPI.jar=HeliumAPI-${{ steps.git-sha.outputs.sha }}.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
