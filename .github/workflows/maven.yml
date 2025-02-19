@@ -16,7 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # Required to get full commit history for short SHA
+          fetch-depth: 0
 
       - name: Set up JDK 11
         uses: actions/setup-java@v4
@@ -30,53 +30,56 @@ jobs:
         run: echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Build with Maven
-        run: mvn -B install --file pom.xml
+        run: mvn -B clean install
         working-directory: HeliumAPI
         shell: bash
 
+      - name: Prepare release artifacts
+        run: |
+          SHORT_SHA="${{ steps.git-sha.outputs.sha }}"
+          mkdir -p release-artifacts
+          # Verify JAR exists before moving
+          if [ -f "HeliumAPI/target/HeliumAPI.jar" ]; then
+            cp HeliumAPI/target/HeliumAPI.jar "release-artifacts/HeliumAPI-${SHORT_SHA}.jar"
+          else
+            echo "❌ Error: JAR file not found!"
+            ls -la HeliumAPI/target/ # Debug output
+            exit 1
+          fi
+
       - name: Delete old release
         run: |
-          # Get the release ID of the latest release
           RELEASE_ID=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/releases/latest" | \
             jq -r '.id')
-
-          # Check if the curl command was successful
-          if [ $? -ne 0 ]; then
-            echo "Failed to retrieve release ID. Skipping deletion."
-            exit 0 # Exit gracefully, don't fail the workflow
-          fi
-
-          # Delete the old release if it exists
+          
           if [ "$RELEASE_ID" != "null" ]; then
-            echo "Deleting old release with ID: $RELEASE_ID"
+            echo "Deleting old release ID: $RELEASE_ID"
             curl -X DELETE -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
               "https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID"
-            if [ $? -ne 0 ]; then
-              echo "Failed to delete release with ID: $RELEASE_ID.  Continuing..."
-            fi
-          else
-            echo "No old release found."
           fi
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: latest-build
-          name: "Latest Release (${{ github.run_id }})"
-          body: "Release created by GitHub Actions\nCommit: ${{ github.sha }}"
-          prerelease: false
-          draft: false
-          overwrite: true
+          name: "Build ${{ github.run_number }} (${{ steps.git-sha.outputs.sha }})"
+          body: |
+            ✅ Automatic build from GitHub Actions
+            - Commit: [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+            - Triggered by: @${{ github.actor }}
           files: |
-            HeliumAPI/target/HeliumAPI.jar=HeliumAPI-${{ steps.git-sha.outputs.sha }}.jar
+            release-artifacts/HeliumAPI-*.jar
+          draft: false
+          prerelease: false
+          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Force push updated tag
+      - name: Force update tag
         if: github.event_name == 'push'
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git tag -fa latest-build -m "Automated build ${{ github.run_id }}"
+          git tag -fa latest-build -m "Automated build ${{ github.run_number }}"
           git push origin latest-build --force
