@@ -79,6 +79,28 @@ enum class HeliumAPI {
     fun isStaffChat(uuid: UUID): Boolean {
         throw RuntimeException("HeliumAPI is not a plugin!")
     }
+    
+    @Throws(RuntimeException::class)
+    fun isManagementChat(uuid: UUID): Boolean {
+        throw RuntimeException("HeliumAPI is not a plugin!")
+    }
+
+    
+    @Throws(RuntimeException::class)
+    fun isDevChat(uuid: UUID): Boolean {
+        throw RuntimeException("HeliumAPI is not a plugin!")
+    }
+
+    
+    @Throws(RuntimeException::class)
+    fun isDonatorChat(uuid: UUID): Boolean {
+        throw RuntimeException("HeliumAPI is not a plugin!")
+    }
+    
+    @Throws(RuntimeException::class)
+    fun isSynced(uuid: UUID): Boolean {
+        throw RuntimeException("HeliumAPI is not a plugin!")
+    }
 
     @Throws(RuntimeException::class)
     fun isMuted(uuid: UUID): Boolean {
@@ -112,16 +134,6 @@ enum class HeliumAPI {
 
     @Throws(RuntimeException::class)
     fun getNotes(uuid: UUID): List<String> {
-        throw RuntimeException("HeliumAPI is not a plugin!")
-    }
-
-    @Throws(RuntimeException::class)
-    fun isinAdminChat(uuid: UUID): Boolean {
-        throw RuntimeException("HeliumAPI is not a plugin!")
-    }
-
-    @Throws(RuntimeException::class)
-    fun isinStaffChat(uuid: UUID): Boolean {
         throw RuntimeException("HeliumAPI is not a plugin!")
     }
 
