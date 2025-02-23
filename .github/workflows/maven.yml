@@ -63,11 +63,22 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: latest-build
-          name: "Build ${{ github.run_number }} (${{ steps.git-sha.outputs.sha }})"
+          name: "HeliumAPI Build ${{ github.run_number }} (${{ steps.git-sha.outputs.sha }})"
           body: |
-            ✅ Automatic build from GitHub Actions
+            ✅ HeliumAPI Build ${{ github.run_number }}
             - Commit: [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
             - Triggered by: @${{ github.actor }}
+            - Usage:
+            - Create a libs folder in your project root and then add the HeliumAPI JAR file to it.
+            - Then, add the following to your pom.xml:
+            - ```
+            - <dependency>
+            -      <groupId>services.plasma</groupId>
+            -      <artifactId>helium-api</artifactId>
+            -      <version>${{ github.run_number }}</version>
+            -      <scope>system</scope>
+            -      <systemPath>${project.basedir}/libs/HeliumAPI-${{ steps.git-sha.outputs.sha }}.jar</systemPath>
+            -  </dependency>```
           files: |
             release-artifacts/HeliumAPI-*.jar
           draft: false
