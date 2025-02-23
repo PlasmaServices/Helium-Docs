@@ -65,9 +65,10 @@ jobs:
           tag_name: latest-build
           name: "HeliumAPI Build ${{ github.run_number }} (${{ steps.git-sha.outputs.sha }})"
           body: |
-            ✅ HeliumAPI Build ${{ github.run_number }}
+            ✅ HeliumAPI Build ${{ github.run_number }} (${{ steps.git-sha.outputs.sha }})
             - Commit: [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
             - Triggered by: @${{ github.actor }}
+             
             Usage:
             - Create a libs folder in your project root and then add the HeliumAPI JAR file to it.
             - Then, add the following to your pom.xml:
@@ -78,7 +79,8 @@ jobs:
                   <version>${{ github.run_number }}</version>
                   <scope>system</scope>
                   <systemPath>${project.basedir}/libs/HeliumAPI-${{ steps.git-sha.outputs.sha }}.jar</systemPath>
-              </dependency>```
+              </dependency>
+              ```
           files: |
             release-artifacts/HeliumAPI-*.jar
           draft: false
