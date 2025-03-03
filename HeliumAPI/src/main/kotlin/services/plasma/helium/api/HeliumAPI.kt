@@ -157,4 +157,9 @@ enum class HeliumAPI {
         throw RuntimeException("HeliumAPI is not a plugin!")
     }
 
+    @Throws(RuntimeException::class)
+    fun isCommandBlocked(command: String): Boolean {
+        throw RuntimeException("HeliumAPI is not a plugin!")
+    }
+
 }
