@@ -1,5 +1,8 @@
 package services.plasma.helium.api
 
+import org.bukkit.Material
+import org.bukkit.entity.Player
+import org.bukkit.plugin.Plugin
 import java.util.UUID
 
 enum class HeliumAPI {
@@ -159,6 +162,78 @@ enum class HeliumAPI {
 
     @Throws(RuntimeException::class)
     fun isCommandBlocked(command: String): Boolean {
+        throw RuntimeException("HeliumAPI is not a plugin!")
+    }
+
+    @Throws(RuntimeException::class)
+    fun registerBooleanSetting(
+        plugin: Plugin,
+        key: String,
+        displayName: String,
+        description: String,
+        icon: Material,
+        defaultValue: Boolean,
+        onChange: (Player, Boolean) -> Unit
+    ): Boolean {
+        throw RuntimeException("HeliumAPI is not a plugin!")
+    }
+
+    @Throws(RuntimeException::class)
+    fun registerMultiChoiceSetting(
+        plugin: Plugin,
+        key: String,
+        displayName: String,
+        description: String,
+        icon: Material,
+        options: List<String>,
+        defaultValue: String,
+        onChange: (Player, String) -> Unit
+    ): Boolean {
+        throw RuntimeException("HeliumAPI is not a plugin!")
+    }
+
+    @Throws(RuntimeException::class)
+    fun getBooleanSetting(
+        player: Player,
+        plugin: Plugin,
+        key: String,
+        defaultValue: Boolean
+    ): Boolean {
+        throw RuntimeException("HeliumAPI is not a plugin!")
+    }
+
+    @Throws(RuntimeException::class)
+    fun getStringSetting(
+        player: Player,
+        plugin: Plugin,
+        key: String,
+        defaultValue: String
+    ): String {
+        throw RuntimeException("HeliumAPI is not a plugin!")
+    }
+
+    @Throws(RuntimeException::class)
+    fun updateBooleanSetting(
+        player: Player,
+        plugin: Plugin,
+        key: String,
+        value: Boolean
+    ): Boolean {
+        throw RuntimeException("HeliumAPI is not a plugin!")
+    }
+
+    @Throws(RuntimeException::class)
+    fun updateStringSetting(
+        player: Player,
+        plugin: Plugin,
+        key: String,
+        value: String
+    ): Boolean {
+        throw RuntimeException("HeliumAPI is not a plugin!")
+    }
+
+    @Throws(RuntimeException::class)
+    fun unregisterSettings(plugin: Plugin) {
         throw RuntimeException("HeliumAPI is not a plugin!")
     }
 
