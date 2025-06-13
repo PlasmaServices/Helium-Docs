@@ -162,4 +162,14 @@ enum class HeliumAPI {
         throw RuntimeException("HeliumAPI is not a plugin!")
     }
 
+    @Throws(RuntimeException::class)
+    fun refreshPlayer(uuid: UUID) {
+        throw RuntimeException("HeliumAPI is not a plugin!")
+    }
+
+    @Throws(RuntimeException::class)
+    fun refreshAllPlayers() {
+        throw RuntimeException("HeliumAPI is not a plugin!")
+    }
+
 }
