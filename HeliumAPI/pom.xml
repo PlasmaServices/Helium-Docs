@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>HeliumAPI</artifactId>
-    <groupId>services.plasma.haddons</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>services.plasma.plasma</groupId>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
 
     <name>HeliumAPI</name>
@@ -57,6 +57,12 @@
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
             <version>1.9.22</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.42</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

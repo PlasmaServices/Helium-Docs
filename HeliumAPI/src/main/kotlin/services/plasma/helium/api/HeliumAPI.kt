@@ -1,5 +1,6 @@
 package services.plasma.helium.api
 
+import services.plasma.helium.profile.punishment.Punishment
 import java.util.UUID
 
 enum class HeliumAPI {
@@ -169,6 +170,11 @@ enum class HeliumAPI {
 
     @Throws(RuntimeException::class)
     fun refreshAllPlayers() {
+        throw RuntimeException("HeliumAPI is not a plugin!")
+    }
+
+    @Throws(RuntimeException::class)
+    fun getAllPunishments(uuid: UUID): List<Punishment> {
         throw RuntimeException("HeliumAPI is not a plugin!")
     }
 
